@@ -3,111 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Lifestyle Tracker</title>
+    <title>5-Month Warrior Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0f172a; --accent: #3b82f6; --success: #22c55e; --bg: #f1f5f9; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #334155; padding: 20px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; margin: auto; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .full-width { grid-column: span 2; }
-        h2 { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-        .habit-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #e2e8f0; }
-        .timer-display { font-size: 3rem; font-weight: bold; text-align: center; margin: 10px 0; font-family: monospace; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .btn-start { background: var(--success); color: white; }
-        .btn-water { background: var(--accent); color: white; width: 100%; font-size: 1.2rem; }
-        .progress-bar { background: #e2e8f0; border-radius: 10px; height: 20px; overflow: hidden; margin: 10px 0; }
-        #waterFill { background: var(--accent); height: 100%; width: 0%; transition: 0.3s; }
+        :root { 
+            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9;
+            --accent: #38bdf8; --success: #4ade80; --danger: #f87171;
+            --border: #334155;
+        }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); 
+            color: var(--text); padding: 20px; margin: 0;
+        }
+        .container { max-width: 1100px; margin: auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-weight: 800; color: var(--accent); margin-bottom: 5px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .card { 
+            background: var(--card); padding: 24px; border-radius: 20px; 
+            border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+        }
+        
+        h2 { font-size: 1.1rem; margin-top: 0; display: flex; align-items: center; gap: 10px; color: var(--accent); }
+        
+        /* Study Clock */
+        .timer-display { 
+            font-family: 'JetBrains Mono', monospace; font-size: 3.5rem; 
+            text-align: center; margin: 20px 0; color: var(--text);
+        }
+        
+        /* Habits */
+        .habit-item { 
+            display: flex; align-items: center; padding: 12px; 
+            background: #273549; border-radius: 12px; margin-bottom: 8px; transition: 0.2s;
+        }
+        .habit-item:hover { background: #334155; }
+        input[type="checkbox"] { width: 18px; height: 18px; margin-right: 12px; accent-color: var(--accent); }
+
+        /* Inputs & Buttons */
+        .input-box { 
+            width: 100%; padding: 12px; background: #273549; border: 1px solid var(--border);
+            border-radius: 10px; color: white; margin-bottom: 15px; box-sizing: border-box;
+        }
+        .btn { 
+            padding: 12px; border: none; border-radius: 12px; cursor: pointer; 
+            font-weight: 700; width: 100%; transition: transform 0.1s, opacity 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--accent); color: var(--bg); }
+        .btn-success { background: var(--success); color: var(--bg); margin-top: 15px; font-size: 1rem; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: #94a3b8; margin-top: 10px; }
+
+        /* Progress */
+        .bar-bg { background: #334155; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; }
+        .bar-fill { background: var(--accent); width: 0%; height: 100%; transition: 0.4s; }
+
+        .quote-box { 
+            margin-top: 30px; padding: 20px; text-align: center; 
+            border-top: 1px solid var(--border); font-style: italic; color: #94a3b8;
+        }
     </style>
 </head>
 <body>
 
-<div class="grid">
-    <div class="card">
-        <h2>⏱️ Study Focus Timer</h2>
-        <div class="timer-display" id="display">00:00:00</div>
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <button class="btn btn-start" onclick="startTimer()">Start</button>
-            <button class="btn" style="background:#ef4444; color:white;" onclick="stopTimer()">Pause</button>
-            <button class="btn" style="background:#64748b; color:white;" onclick="resetTimer()">Reset</button>
+<div class="container">
+    <div class="header">
+        <h1>WARRIOR MODE</h1>
+        <div id="dateDisplay"></div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>⏱️ Focus Sessions</h2>
+            <div class="timer-display" id="timer">00:00:00</div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="toggleT(this)">Start Session</button>
+                <button class="btn btn-outline" onclick="resetT()">Reset</button>
+            </div>
+            <p style="font-size: 0.8rem; text-align: center; color: #94a3b8; margin-top: 10px;">Target: 8h - 10h per day</p>
         </div>
-        <p style="text-align:center; margin-top:15px;">Goal: 8 - 10 Hours</p>
+
+        <div class="card">
+            <h2>💧 Hydration (3L)</h2>
+            <div style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 5px;">
+                <span id="wCount">0</span> / 3000ml
+            </div>
+            <div class="bar-bg"><div id="wFill" class="bar-fill"></div></div>
+            <button class="btn btn-outline" onclick="addW()">+ 250ml Glass</button>
+
+            <h2 style="margin-top: 25px;">🎯 MCQ Target</h2>
+            <input type="number" id="mcqVal" class="input-box" placeholder="Amount solved today...">
+        </div>
+
+        <div class="card">
+            <h2>⚔️ Daily Discipline</h2>
+            <div id="habitContainer"></div>
+        </div>
+
+        <div class="card">
+            <h2>📈 Progress Visualization</h2>
+            <canvas id="growthChart"></canvas>
+            <button class="btn btn-success" onclick="logProgress()">END DAY & LOG GROWTH</button>
+            <button class="btn btn-outline" onclick="downloadData()">📦 Backup 5-Month Data</button>
+        </div>
     </div>
 
-    <div class="card">
-        <h2>💧 Water Intake</h2>
-        <div class="timer-display"><span id="waterCount">0</span>/3000 <small style="font-size:1rem">ml</small></div>
-        <div class="progress-bar"><div id="waterFill"></div></div>
-        <button class="btn btn-water" onclick="addWater()">+ 250ml Glass</button>
-    </div>
-
-    <div class="card">
-        <h2>✅ Daily Checklist</h2>
-        <div id="habitList"></div>
-    </div>
-
-    <div class="card">
-        <h2>📈 5-Month Growth</h2>
-        <canvas id="growthChart"></canvas>
-        <button class="btn btn-start" style="width:100%; margin-top:20px;" onclick="logDay()">Save & End Day</button>
-    </div>
+    <div class="quote-box" id="quoteArea">"The pain of discipline is far less than the pain of regret."</div>
 </div>
 
 <script>
-    // --- HABITS SETUP ---
-    const habitNames = ["Wake up 5am", "Morning Ex", "Bath", "Healthy Breakfast", "No Oil/Sugar", "Evening Ex", "Skin AM", "Skin PM", "MCQ (80-100)"];
-    const listDiv = document.getElementById('habitList');
-    habitNames.forEach((h, i) => {
-        listDiv.innerHTML += `<div class="habit-item"><input type="checkbox" id="h${i}"> <label>&nbsp;${h}</label></div>`;
+    const habits = ["Wake up at 5AM", "Morning Exercise", "Cold/Fresh Bath", "Healthy Breakfast", "Zero Oily/Sugar", "Evening Exercise", "Skin Care AM", "Skin Care PM"];
+    const container = document.getElementById('habitContainer');
+    habits.forEach((h, i) => {
+        container.innerHTML += `<div class="habit-item"><input type="checkbox" id="h${i}"><label>${h}</label></div>`;
     });
 
-    // --- TIMER LOGIC ---
-    let startTime, elapsedTime = 0, timerInterval;
-    function startTimer() {
-        startTime = Date.now() - elapsedTime;
-        timerInterval = setInterval(() => {
-            elapsedTime = Date.now() - startTime;
-            document.getElementById("display").innerHTML = formatTime(elapsedTime);
-        }, 1000);
+    // Time & Water
+    let tSec = 0, tInterval, water = 0, running = false;
+    function toggleT(btn) {
+        if(!running) {
+            tInterval = setInterval(() => { tSec++; document.getElementById('timer').innerText = new Date(tSec * 1000).toISOString().substr(11, 8); }, 1000);
+            btn.innerText = "Pause Session"; btn.style.background = "#f87171"; running = true;
+        } else {
+            clearInterval(tInterval); btn.innerText = "Resume Session"; btn.style.background = "#38bdf8"; running = false;
+        }
     }
-    function stopTimer() { clearInterval(timerInterval); }
-    function resetTimer() { stopTimer(); elapsedTime = 0; document.getElementById("display").innerHTML = "00:00:00"; }
-    function formatTime(ms) {
-        let h = Math.floor(ms / 3600000);
-        let m = Math.floor((ms % 3600000) / 60000);
-        let s = Math.floor((ms % 60000) / 1000);
-        return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-    }
+    function resetT() { clearInterval(tInterval); tSec = 0; document.getElementById('timer').innerText = "00:00:00"; running = false; }
+    function addW() { if(water < 3000) { water += 250; document.getElementById('wCount').innerText = water; document.getElementById('wFill').style.width = (water/3000*100)+'%'; } }
 
-    // --- WATER LOGIC ---
-    let water = 0;
-    function addWater() {
-        if(water < 3000) water += 250;
-        document.getElementById('waterCount').innerText = water;
-        document.getElementById('waterFill').style.width = (water / 3000 * 100) + '%';
-    }
-
-    // --- CHART & STORAGE ---
-    let history = JSON.parse(localStorage.getItem('warriorHistory')) || [];
-    const ctx = document.getElementById('growthChart').getContext('2d');
-    let chart = new Chart(ctx, {
+    // Chart & Storage
+    let db = JSON.parse(localStorage.getItem('warrior_v1')) || [];
+    const chart = new Chart(document.getElementById('growthChart'), {
         type: 'line',
-        data: { labels: history.map(d => d.date), datasets: [{ label: 'Performance %', data: history.map(d => d.score), borderColor: '#3b82f6', fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)' }] },
-        options: { scales: { y: { min: 0, max: 100 } } }
+        data: { labels: db.map(d => d.date), datasets: [{ label: 'Success %', data: db.map(d => d.score), borderColor: '#38bdf8', tension: 0.3, fill: true, backgroundColor: 'rgba(56, 189, 248, 0.1)' }] },
+        options: { scales: { y: { min: 0, max: 100, grid: { color: '#334155' } }, x: { grid: { display: false } } } }
     });
 
-    function logDay() {
-        let checks = 0;
-        habitNames.forEach((_, i) => { if(document.getElementById(`h${i}`).checked) checks++; });
-        if (elapsedTime >= 28800000) checks++; // 8 hours study bonus
-        if (water >= 3000) checks++; // Water bonus
-        
-        let score = Math.round((checks / 11) * 100);
-        history.push({ date: new Date().toLocaleDateString(), score: score });
-        localStorage.setItem('warriorHistory', JSON.stringify(history));
-        location.reload(); // Reset for tomorrow
+    function logProgress() {
+        let pts = 0;
+        habits.forEach((_, i) => { if(document.getElementById(`h${i}`).checked) pts++; });
+        if(tSec >= 28800) pts++; // 8 hours
+        if(water >= 3000) pts++;
+        if(document.getElementById('mcqVal').value >= 80) pts++;
+
+        const score = Math.round((pts / 11) * 100);
+        db.push({ date: new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short'}), score: score });
+        localStorage.setItem('warrior_v1', JSON.stringify(db));
+        alert("Day Saved. Stay consistent.");
+        location.reload();
     }
+
+    function downloadData() {
+        const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+        const link = document.createElement('a');
+        link.setAttribute("href", data); link.setAttribute("download", "my_growth_data.json");
+        document.body.appendChild(link); link.click(); link.remove();
+    }
+
+    // Dynamic Quotes
+    const quotes = [
+        "Suffer the pain of discipline or suffer the pain of regret.",
+        "Your future self is counting on you.",
+        "8 hours of study is a habit, not a chore.",
+        "Don't stop when you're tired. Stop when you're done.",
+        "Consistency is what transforms average into excellence."
+    ];
+    document.getElementById('quoteArea').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+    document.getElementById('dateDisplay').innerText = new Date().toDateString();
 </script>
+
 </body>
 </html>
